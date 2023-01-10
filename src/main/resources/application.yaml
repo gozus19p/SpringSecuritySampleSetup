@@ -1,0 +1,15 @@
+spring:
+  security:
+    strategy: MODE_INHERITABLETHREADLOCAL
+
+app:
+  session:
+    max-inactive-interval-duration: 1s
+
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+debug:
+  true
