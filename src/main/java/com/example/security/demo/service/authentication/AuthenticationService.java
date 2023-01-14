@@ -10,22 +10,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Manuel Gozzi
@@ -38,18 +33,13 @@ public class AuthenticationService {
 
     private final JwtService jwtService;
 
-    @Value("${app.session.max-inactive-interval-duration}")
-    private Duration httpSessionMaxInactiveIntervalDuration;
-
     @Autowired
     public AuthenticationService(MyUserDetailsService myUserDetailsService, JwtService jwtService) {
         this.myUserDetailsService = myUserDetailsService;
         this.jwtService = jwtService;
     }
 
-    public String login(
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<Void> login(HttpServletRequest request) {
 
         BasicAuthCredentials basicAuthCredentials = this.parseBasicCredentials(request);
 
@@ -64,17 +54,17 @@ public class AuthenticationService {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(authentication);
 
-            // Restituisco l'elenco delle authorities (dei ruoli) possedute dall'utente
-            return this.jwtService.create(user);
+            String token = this.jwtService.create(user);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", token))
+                    .build();
         } else {
 
             throw new HttpStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials provided");
         }
     }
 
-    public void logout(
-            HttpServletRequest request
-    ) {
+    public void logout(HttpServletRequest request) {
 
         HttpSession session = request.getSession(false);
         if (session == null)

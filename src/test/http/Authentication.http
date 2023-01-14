@@ -1,0 +1,7 @@
+### Login via Basic authentication (user `admin`, password `test`)
+GET http://localhost:8080/api/v1/auth/login
+Authorization: Basic YWRtaW46dGVzdA==
+
+###
+GET http://localhost:8080/api/v1/sample/hello
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwianRpIjoiZjcxOGE5MmItZTk3NC00YWQyLWFiOTUtOGUwNDg5ZjY0ZDgwIiwiaWF0IjoxNjczNzIyNTQwLCJleHAiOjE2NzM3MjI4NDB9.jSqGVOlO9_HhuMetEgEOBzq0k6r9MDPc6qOKo3hykzScoktfwgNBLvUKzZv_UNjTD7wDpyjkYNmbMiPeuJCPPA
