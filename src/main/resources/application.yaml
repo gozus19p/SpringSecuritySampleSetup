@@ -74,7 +74,9 @@ app:
       RfiVPSoQut4vme9786y0aQIDAQAB
       -----END PUBLIC KEY-----
 
-
+    # Generated with `openssl rand -base64 172 | tr -d '\n'`
+    secret: |-
+      5E9Q6Jc/JKyOosMs7D/dcpac2yFnka94FW3PFlGaiu6ganGDHuRx3LJiOFMB+PIwzvM5XECcFn16LzB+cjWWWhXgwGNh8YPnSYRJPXpY84M2JlvjxjnOxQSlsv7VGYGp/zySnCH6tHtJaB/cOv0xjfgo7p7UuCxKHambVQ8DW5N7yn9MY2vo+1ias/bHYiKiuS1AS4zYdZd0zAXDNv7SwUriG7nu1Gp4dDQvnA==
 logging:
   level:
     org.springframework.security: DEBUG

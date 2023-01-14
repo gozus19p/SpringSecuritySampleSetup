@@ -1,9 +1,11 @@
 package com.example.security.demo.filter;
 
+import com.example.security.demo.service.authentication.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,19 +17,22 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * @author Manuel Gozzi
  */
+@Slf4j
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
+    private final JwtService jwtService;
+
     @Autowired
-    public JwtTokenFilter(UserDetailsService userDetailsService) {
+    public JwtTokenFilter(UserDetailsService userDetailsService, JwtService jwtService) {
         this.userDetailsService = userDetailsService;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -44,17 +49,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // Get jwt token and validate
         final String token = header.split(" ")[1].trim();
-        if (!new JwtTokenUtil().validate(token)) {
+        if (this.jwtService.isExpired(token)) {
+
+            log.debug("Token is expired");
             filterChain.doFilter(request, response);
             return;
         }
 
         // Get user identity and set it on the spring security context
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(
-                getUsername(token)
-        );
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(this.jwtService.usernameOf(token));
         if (userDetails == null) {
 
+            log.debug("No username found on token");
             filterChain.doFilter(request, response);
             return;
         }

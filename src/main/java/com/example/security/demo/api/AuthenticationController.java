@@ -26,7 +26,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/login")
-    public List<String> login(
+    public String login(
             HttpServletRequest request
     ) {
 

@@ -35,15 +35,18 @@ public class AuthenticationService {
 
     private final MyUserDetailsService myUserDetailsService;
 
+    private final JwtService jwtService;
+
     @Value("${app.session.max-inactive-interval-duration}")
     private Duration httpSessionMaxInactiveIntervalDuration;
 
     @Autowired
-    public AuthenticationService(MyUserDetailsService myUserDetailsService) {
+    public AuthenticationService(MyUserDetailsService myUserDetailsService, JwtService jwtService) {
         this.myUserDetailsService = myUserDetailsService;
+        this.jwtService = jwtService;
     }
 
-    public List<String> login(
+    public String login(
             HttpServletRequest request
     ) {
 
@@ -60,31 +63,8 @@ public class AuthenticationService {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(authentication);
 
-            /*
-             * Controllo l'esistenza di sessioni precedenti. Se ne trovo, restituisco eccezione (poiché posso procedere
-             * con il login solamente se non esistono altre sessioni precedenti).
-             */
-            HttpSession preExistingSession = request.getSession(false);
-            if (preExistingSession != null) {
-
-                // Restituisco un 409
-                throw new HttpStatusException(
-                        HttpStatus.CONFLICT,
-                        String.format(
-                                "User with username [%s] is already logged in",
-                                basicAuthCredentials.getUsername()
-                        )
-                );
-            }
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-            session.setMaxInactiveInterval(this.httpSessionMaxInactiveIntervalDuration.toSecondsPart());
-
             // Restituisco l'elenco delle authorities (dei ruoli) possedute dall'utente
-            return user.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
+            return this.jwtService.create(user);
         } else {
 
             throw new HttpStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials provided");
