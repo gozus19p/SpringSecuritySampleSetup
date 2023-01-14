@@ -33,7 +33,7 @@ public class SecurityConfiguration {
     @Value("${app.jwt.rsa-private-key}")
     private RSAPrivateKey rsaPrivateKey;
 
-    @Value("${app.jwt.rsa-public-key")
+    @Value("${app.jwt.rsa-public-key}")
     private RSAPublicKey rsaPublicKey;
 
     @Autowired

@@ -26,6 +26,9 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api
 //	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+	implementation 'javax.xml.bind:jaxb-api:2.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
