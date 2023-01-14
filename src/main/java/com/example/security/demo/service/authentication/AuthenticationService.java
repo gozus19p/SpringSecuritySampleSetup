@@ -2,6 +2,7 @@ package com.example.security.demo.service.authentication;
 
 import com.example.security.demo.service.authentication.exception.HttpStatusException;
 import com.example.security.demo.service.userdetails.MyUserDetailsService;
+import com.example.security.demo.service.userdetails.dto.MyUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,7 @@ public class AuthenticationService {
 
         BasicAuthCredentials basicAuthCredentials = this.parseBasicCredentials(request);
 
-        UserDetails user = this.myUserDetailsService.loadUserByUsername(basicAuthCredentials.getUsername());
+        MyUserDetails user = (MyUserDetails) this.myUserDetailsService.loadUserByUsername(basicAuthCredentials.getUsername());
         if (this.myUserDetailsService.getPasswordEncoder().matches(basicAuthCredentials.getPassword(), user.getPassword())) {
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(

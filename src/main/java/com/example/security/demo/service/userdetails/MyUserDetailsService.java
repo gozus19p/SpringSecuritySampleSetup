@@ -1,5 +1,6 @@
 package com.example.security.demo.service.userdetails;
 
+import com.example.security.demo.service.userdetails.dto.MyUserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,17 +19,24 @@ import java.util.Map;
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<String, MyUserDetails> users = new HashMap<>();
 
     private final PasswordEncoder passwordEncoder;
 
     public MyUserDetailsService(PasswordEncoder passwordEncoder) {
+
         this.passwordEncoder = passwordEncoder;
 
-        this.users.put(
-                "admin",
-                new User("admin", this.passwordEncoder.encode("test"), Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")))
+        MyUserDetails admin = new MyUserDetails();
+        admin.setUsername("admin");
+        admin.setEncodedPassword(
+                this.passwordEncoder.encode("test")
         );
+        admin.setAuthorities(
+                Collections.singletonList("ROLE_ADMIN")
+        );
+
+        this.users.put("admin", admin);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.security.demo.filter;
 
 import com.example.security.demo.service.authentication.JwtService;
+import com.example.security.demo.service.userdetails.dto.MyUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -57,10 +57,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         // Get user identity and set it on the spring security context
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(this.jwtService.usernameOf(token));
+        MyUserDetails userDetails = (MyUserDetails) this.userDetailsService.loadUserByUsername(
+                this.jwtService.usernameOf(token)
+        );
         if (userDetails == null) {
 
             log.debug("No username found on token");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (!this.jwtService.validate(token, userDetails)) {
+
+            log.debug("Token is not valid");
             filterChain.doFilter(request, response);
             return;
         }
